@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# Creacion de URL principal para acceder a los metodos en el archivo views.py
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('equipo/', include('web_app.dto.urls')),
+    path('app/', include('web_app.dto.urls')),
 ]
