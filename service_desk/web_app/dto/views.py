@@ -1,12 +1,12 @@
 from rest_framework.response import Response
 from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud
 from web_app.dto.serializers import Cat_Equipo_Serializado, Cat_Cliente_Serializado, Cat_Servicio_Serializado, Cat_Producto_Serializado, Opr_Solicitud_Serializado
-# from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 
 # Clases para crear los querys de consulta de la base de datos
-# Crear Class para mostrar la lista de elementos tipo SOLICITUD
+# Class para mostrar la lista de elementos tipo SOLICITUD y crear un elemento tipo SOLICITUD
 class solicitud_listaAV(APIView):
     def get(self, request):
         solicitudes = Opr_Solicitud.objects.all()
@@ -21,7 +21,37 @@ class solicitud_listaAV(APIView):
         else:
             return Response(solicitudes_deserializados.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Crear Class para mostrar la lista de elementos tipo PRODUCTO
+# Class Views para mostrar|actualizar|eliminar un elemento tipo CLIENTE
+class solicitud_detalleAV(APIView):
+    def get(self, request, id):
+        try:
+            solicitud = Opr_Solicitud.objects.get(pk=id)
+        except Opr_Solicitud.DoesNotExist:
+            return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        solicitud_serializado = Opr_Solicitud_Serializado(solicitud)
+        return Response(solicitud_serializado.data)
+
+    def put(self, request, id):
+        try:
+            solicitud = Opr_Solicitud.objects.get(pk=id)
+        except Opr_Solicitud.DoesNotExist:
+            return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        solicitud_serializado = Opr_Solicitud_Serializado(solicitud, data=request.data)
+        if solicitud_serializado.is_valid():
+            solicitud_serializado.save()
+            return Response(solicitud_serializado.data)
+        else:
+            return Response(solicitud_serializado.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        try:
+            solicitud = Opr_Solicitud.objects.get(pk=id)
+        except Opr_Solicitud.DoesNotExist:
+            return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        solicitud.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO
 class producto_listaAV(APIView):
     def get(self, request):
         productos = Cat_Producto.objects.all()
@@ -36,7 +66,7 @@ class producto_listaAV(APIView):
         else:
             return Response(productos_deserializados.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Crear Class para mostrar la lista de elementos tipo SERVICIO
+# Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO
 class servicio_listaAV(APIView):
     def get(self, request):
         servicios = Cat_Servicio.objects.all()
@@ -52,11 +82,11 @@ class servicio_listaAV(APIView):
             return Response(servicios_deserializados.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Crear Class para mostrar la lista de elementos tipo CLIENTE
+# Class para mostrar la lista de elementos tipo CLIENTE y crear un elemento tipo CLIENTE
 class cliente_listaAV(APIView):
     def get(self, request):
         clientes = Cat_Cliente.objects.all()
-        clientes_serializados = Cat_Cliente_Serializado(clientes, many=True)
+        clientes_serializados = Cat_Cliente_Serializado(clientes, many=True, context={'request': request})
         return Response(clientes_serializados.data)
 
     def post(self, request):
@@ -67,12 +97,43 @@ class cliente_listaAV(APIView):
         else:
             return Response(clientes_deserializados.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# Class Views para mostrar|actualizar|eliminar un elemento tipo CLIENTE
+class cliente_detalleAV(APIView):
+    def get(self, request, id):
+        try:
+            cliente = Cat_Cliente.objects.get(pk=id)
+        except Cat_Cliente.DoesNotExist:
+            return Response({'error': 'Cliente no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        cliente_serializado = Cat_Cliente_Serializado(cliente, context={'request': request})
+        return Response(cliente_serializado.data)
 
-# Crear Class para mostrar la lista de elementos tipo EQUIPO
+    def put(self, request, id):
+        try:
+            cliente = Cat_Cliente.objects.get(pk=id)
+        except Cat_Cliente.DoesNotExist:
+            return Response({'error': 'Cliente no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        cliente_serializado = Cat_Cliente_Serializado(cliente, data=request.data, context={'request': request})
+        if cliente_serializado.is_valid():
+            cliente_serializado.save()
+            return Response(cliente_serializado.data)
+        else:
+            return Response(cliente_serializado.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        try:
+            cliente = Cat_Cliente.objects.get(pk=id)
+        except Cat_Cliente.DoesNotExist:
+            return Response({'error': 'Cliente no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        cliente.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+# Class para mostrar la lista de elementos tipo EQUIPO y crear un elemento tipo EQUIPO
 class equipo_listaAV(APIView):
     def get(self, request):
         equipos = Cat_Equipo.objects.all() # Guarda el listado de los todos los elementos de tipo EQUIPO
-        equipos_serializados = Cat_Equipo_Serializado(equipos, many=True) # Serializa toda la informacion tipo EQUIPO
+        equipos_serializados = Cat_Equipo_Serializado(equipos, many=True, context={'request': request}) # Serializa toda la informacion tipo EQUIPO
         return Response(equipos_serializados.data) # Devuelve los datos serializados en un formato tipo JSON
 
     def post(self, request):
@@ -83,14 +144,14 @@ class equipo_listaAV(APIView):
         else:
             return Response(equipos_deserializados.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Crear Class Views para mostrar|actualizar|eliminar
+# Class Views para mostrar|actualizar|eliminar un elemento tipo EQUIPO
 class equipo_detalleAV(APIView):
     def get(self, request, id):
         try:
             equipo = Cat_Equipo.objects.get(pk=id)
         except Cat_Equipo.DoesNotExist:
             return Response({'error': 'Equipo no encontrado'}, status=status.HTTP_404_NOT_FOUND)
-        equipo_serializado = Cat_Equipo_Serializado(equipo)
+        equipo_serializado = Cat_Equipo_Serializado(equipo, context={'request': request})
         return Response(equipo_serializado.data)
 
     def put(self, request, id):

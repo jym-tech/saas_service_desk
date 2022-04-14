@@ -20,17 +20,38 @@ class Cat_Servicio_Serializado(serializers.ModelSerializer):
         fields = "__all__"
 
 # Usando Core Arguments para mapear todas propiedades de la entidad CAT_CLIENTE
-class Cat_Cliente_Serializado(serializers.ModelSerializer):
-    #idCliente = Opr_Solicitud_Serializado(many=True, read_only=True)
-    idCliente = serializers.StringRelatedField(many=True)
+class Cat_Cliente_Serializado(serializers.HyperlinkedModelSerializer):
+    # cliente_solicitud = Opr_Solicitud_Serializado(many=True, read_only=True)
+    # cliente_solicitud = serializers.StringRelatedField(many=True)
+    # cliente_solicitud = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    cliente_solicitud = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        lookup_field='id',
+        view_name='solicitud_detail'
+    )
+    url = serializers.HyperlinkedIdentityField(
+        view_name='cliente_detail',
+        lookup_field='id'
+    )
+
+
     class Meta:
         model = Cat_Cliente
         fields = "__all__"
+        # fields = ['id']
 
 # Usando Core Arguments para mapear todas propiedades de la entidad CAT_EQUIPO
 class Cat_Equipo_Serializado(serializers.ModelSerializer):
-    #idEquipo = Opr_Solicitud_Serializado(many=True, read_only=True)
-    idEquipo = serializers.StringRelatedField(many=True)
+    # equipo_solicitud = Opr_Solicitud_Serializado(many=True, read_only=True)
+    # equipo_solicitud = serializers.StringRelatedField(many=True)
+    # equipo_solicitud = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    equipo_solicitud = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        lookup_field='id',
+        view_name='solicitud_detail'
+    )
 
     class Meta:
         model = Cat_Equipo

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 # Create your models here.
@@ -59,8 +60,8 @@ class Cat_Producto(models.Model):
 # clase que contiene el diseño de la tabla OPR_SOLICITUD
 class Opr_Solicitud(models.Model):
     clave_solicitud = models.CharField(max_length=50)
-    id_cliente_solicitud = models.ForeignKey(Cat_Cliente, on_delete=models.PROTECT, related_name="idCliente")
-    id_equipo_solicitud = models.ForeignKey(Cat_Equipo, on_delete=models.PROTECT, related_name="idEquipo")
+    id_cliente_solicitud = models.ForeignKey(Cat_Cliente, on_delete=models.CASCADE, related_name="cliente_solicitud")
+    id_equipo_solicitud = models.ForeignKey(Cat_Equipo, on_delete=models.CASCADE, related_name="equipo_solicitud")
     diagnostico_solicitud = models.CharField(max_length=500)
     fecha_creacion_solicitud = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_solicitud = models.DateTimeField(auto_now=True)
