@@ -3,14 +3,17 @@ from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, 
 from web_app.dto.serializers import (Cat_Equipo_Serializado, Cat_Cliente_Serializado,
                                      Cat_Servicio_Serializado, Cat_Producto_Serializado,
                                      Opr_Solicitud_Serializado)
-from rest_framework.decorators import api_view
+# from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics, mixins
+from rest_framework.permissions import IsAuthenticated
+from web_app.dto.permissions import AdminOrReadOnly, SolicitudUserOrReadOnly
 
 # Clases para crear los querys de consulta de la base de datos
 # Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO - GENERICO
 class producto_lista_Generico(generics.ListCreateAPIView):
+    permission_classes = [AdminOrReadOnly]
     queryset = Cat_Producto.objects.all()
     serializer_class = Cat_Producto_Serializado
 
@@ -30,6 +33,8 @@ class servicio_lista_Generico(mixins.ListModelMixin, mixins.CreateModelMixin, ge
 
     def post(self, request, *args, **kwargs):
         return  self.create(request, *args, **kwargs)
+
+    permission_classes = [IsAuthenticated]
 
 # Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO - GENERICO
 class servicio_detalle_Generico(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
@@ -91,6 +96,8 @@ class solicitud_detalleAV(APIView):
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    permission_classes = [SolicitudUserOrReadOnly]
 
 # Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO
 class producto_listaAV(APIView):

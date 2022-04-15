@@ -41,6 +41,7 @@ class Cat_Servicio(models.Model):
     sku_servicio = models.CharField(max_length=50)
     tipo_servicio = models.CharField(max_length=50)
     descripcion_servicio = models.CharField(max_length=500)
+    costo_servicio = models.DecimalField(default=0, max_digits=5, decimal_places=2)
     activo_servicio = models.BooleanField(default=True)
 
     # Metodo STR regresa una cadena que muestra las columnas id|descripcion
@@ -52,11 +53,12 @@ class Cat_Producto(models.Model):
     sku_producto = models.CharField(max_length=50)
     tipo_producto = models.CharField(max_length=50)
     descripcion_producto = models.CharField(max_length=500)
+    costo_producto = models.DecimalField(default=0, max_digits=5, decimal_places=2)
     activo_producto = models.BooleanField(default=True)
 
     # Metodo STR regresa una cadena que muestra las columnas id|descripcion
     def __str__(self):
-        return f'Producto {self.id} {self.descripcion_producto}'
+        return f'Producto {self.id} {self.tipo_producto}'
 
 # clase que contiene el diseño de la tabla OPR_SOLICITUD
 class Opr_Solicitud(models.Model):
