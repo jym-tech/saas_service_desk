@@ -1,5 +1,6 @@
 from django.db import models
-from django.urls import reverse
+# from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -59,6 +60,7 @@ class Cat_Producto(models.Model):
 
 # clase que contiene el diseño de la tabla OPR_SOLICITUD
 class Opr_Solicitud(models.Model):
+    usuario_solicitud = models.ForeignKey(User, on_delete=models.CASCADE)
     clave_solicitud = models.CharField(max_length=50)
     id_cliente_solicitud = models.ForeignKey(Cat_Cliente, on_delete=models.CASCADE, related_name="cliente_solicitud")
     id_equipo_solicitud = models.ForeignKey(Cat_Equipo, on_delete=models.CASCADE, related_name="equipo_solicitud")

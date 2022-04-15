@@ -3,6 +3,7 @@ from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, 
 
 # Usando Core Arguments para mapear todas propiedades de la entidad OPR_SOLICITUD
 class Opr_Solicitud_Serializado(serializers.ModelSerializer):
+    usuario_solicitud = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Opr_Solicitud
         fields = "__all__"
@@ -28,10 +29,10 @@ class Cat_Cliente_Serializado(serializers.HyperlinkedModelSerializer):
         many=True,
         read_only=True,
         lookup_field='id',
-        view_name='solicitud_detail'
+        view_name='solicitud-detail'
     )
     url = serializers.HyperlinkedIdentityField(
-        view_name='cliente_detail',
+        view_name='cliente-detail',
         lookup_field='id'
     )
 
@@ -42,7 +43,7 @@ class Cat_Cliente_Serializado(serializers.HyperlinkedModelSerializer):
         # fields = ['id']
 
 # Usando Core Arguments para mapear todas propiedades de la entidad CAT_EQUIPO
-class Cat_Equipo_Serializado(serializers.ModelSerializer):
+class Cat_Equipo_Serializado(serializers.HyperlinkedModelSerializer):
     # equipo_solicitud = Opr_Solicitud_Serializado(many=True, read_only=True)
     # equipo_solicitud = serializers.StringRelatedField(many=True)
     # equipo_solicitud = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -50,7 +51,11 @@ class Cat_Equipo_Serializado(serializers.ModelSerializer):
         many=True,
         read_only=True,
         lookup_field='id',
-        view_name='solicitud_detail'
+        view_name='solicitud-detail'
+    )
+    url = serializers.HyperlinkedIdentityField(
+        view_name='equipo-detail',
+        lookup_field='id'
     )
 
     class Meta:
