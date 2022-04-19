@@ -1,12 +1,13 @@
 from rest_framework import serializers
+
 from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud
 
 # Usando Core Arguments para mapear todas propiedades de la entidad OPR_SOLICITUD
 class Opr_Solicitud_Serializado(serializers.ModelSerializer):
-    usuario_solicitud = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Opr_Solicitud
         fields = "__all__"
+
 
 # Usando Core Arguments para mapear todas propiedades de la entidad CAT_PRODUCTO
 class Cat_Producto_Serializado(serializers.ModelSerializer):

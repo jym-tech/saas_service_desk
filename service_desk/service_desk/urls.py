@@ -18,7 +18,12 @@ from django.urls import path, include
 
 # Creacion de URL principal para acceder a los metodos en el archivo views.py
 urlpatterns = [
+    # Path de administracion de Django Rest Framework
     path('admin/', admin.site.urls),
+
+    # Path de la aplicacion principal
     path('app/', include('web_app.dto.urls')),
+
+    # Login de RestFramework
     path('api-auth', include('rest_framework.urls')),
 ]

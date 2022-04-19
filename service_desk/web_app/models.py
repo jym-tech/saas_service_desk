@@ -1,11 +1,15 @@
-from django.db import models
-# from django.urls import reverse
 from django.contrib.auth.models import User
+from django.db import models
+
+
 
 
 # Create your models here.
 # Crear el modelo de la tabla que corresponda con cada entidad de la Base de Datos
 # clase que contiene el diseño de la tabla CAT_EQUIPO
+
+
+
 class Cat_Equipo(models.Model):
     modelo_equipo = models.CharField(max_length=100)
     marca_equipo = models.CharField(max_length=100)

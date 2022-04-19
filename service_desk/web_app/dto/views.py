@@ -19,12 +19,14 @@ class producto_lista_Generico(generics.ListCreateAPIView):
 
 # Class para mostrar|actualizar|eliminar un elemento tipo PRODUCTO - GENERICO
 class producto_detalle_Generico(generics.RetrieveDestroyAPIView):
+    permission_classes = [AdminOrReadOnly]
     queryset = Cat_Producto.objects.all()
     serializer_class = Cat_Producto_Serializado
     lookup_field = 'id'
 
 # Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO - GENERICO
 class servicio_lista_Generico(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    permission_classes = [AdminOrReadOnly]
     queryset = Cat_Servicio.objects.all()
     serializer_class = Cat_Servicio_Serializado
 
@@ -34,10 +36,10 @@ class servicio_lista_Generico(mixins.ListModelMixin, mixins.CreateModelMixin, ge
     def post(self, request, *args, **kwargs):
         return  self.create(request, *args, **kwargs)
 
-    permission_classes = [IsAuthenticated]
 
 # Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO - GENERICO
 class servicio_detalle_Generico(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+    permission_classes = [AdminOrReadOnly]
     queryset = Cat_Servicio.objects.all()
     serializer_class = Cat_Servicio_Serializado
     lookup_field = 'id'
@@ -55,12 +57,14 @@ class servicio_detalle_Generico(mixins.RetrieveModelMixin, mixins.UpdateModelMix
 # Class para mostrar la lista de elementos tipo SOLICITUD y crear un elemento tipo SOLICITUD
 class solicitud_listaAV(APIView):
     def get(self, request):
-        solicitudes = Opr_Solicitud.objects.all()
+        usuario_actual = self.request.user
+        solicitudes = Opr_Solicitud.objects.filter(usuario_solicitud=usuario_actual)
         solicitudes_serializados = Opr_Solicitud_Serializado(solicitudes, many=True)
         return Response(solicitudes_serializados.data)
 
     def post(self, request):
-        solicitudes_deserializados = Opr_Solicitud_Serializado(solicitudes, many=True)
+        solicitudes_deserializados = Opr_Solicitud_Serializado(data=request.data)
+        request.data['usuario_solicitud'] = request.user.id
         if solicitudes_deserializados.is_valid():
             solicitudes_deserializados.save()
             return Response(solicitudes_deserializados.data)
@@ -69,9 +73,11 @@ class solicitud_listaAV(APIView):
 
 # Class Views para mostrar|actualizar|eliminar un elemento tipo CLIENTE
 class solicitud_detalleAV(APIView):
+    permission_classes = [SolicitudUserOrReadOnly]
     def get(self, request, id):
         try:
-            solicitud = Opr_Solicitud.objects.get(pk=id)
+            usuario_actual = self.request.user
+            solicitud = Opr_Solicitud.objects.get(pk=id, usuario_solicitud=usuario_actual)
         except Opr_Solicitud.DoesNotExist:
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud_serializado = Opr_Solicitud_Serializado(solicitud)
@@ -79,25 +85,32 @@ class solicitud_detalleAV(APIView):
 
     def put(self, request, id):
         try:
-            solicitud = Opr_Solicitud.objects.get(pk=id)
+            usuario_actual = self.request.user
+            solicitud = Opr_Solicitud.objects.get(pk=id, usuario_solicitud=usuario_actual)
         except Opr_Solicitud.DoesNotExist:
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud_serializado = Opr_Solicitud_Serializado(solicitud, data=request.data)
+        request.data['usuario_solicitud'] = request.user.id
         if solicitud_serializado.is_valid():
             solicitud_serializado.save()
             return Response(solicitud_serializado.data)
         else:
             return Response(solicitud_serializado.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
     def delete(self, request, id):
         try:
-            solicitud = Opr_Solicitud.objects.get(pk=id)
+            usuario_actual = self.request.user
+            solicitud = Opr_Solicitud.objects.get(pk=id, usuario_solicitud=usuario_actual)
         except Opr_Solicitud.DoesNotExist:
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
-        solicitud.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    permission_classes = [SolicitudUserOrReadOnly]
+        solicitud_serializado = Opr_Solicitud_Serializado(solicitud, data=request.data, partial=True)
+        request.data['activo_solicitud'] = False
+        if solicitud_serializado.is_valid():
+            solicitud_serializado.save()
+            return Response(solicitud_serializado.errors, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(solicitud_serializado.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO
 class producto_listaAV(APIView):
@@ -107,7 +120,7 @@ class producto_listaAV(APIView):
         return Response(productos_serializados.data)
 
     def post(self, request):
-        productos_deserializados = Cat_Producto_Serializado(productos, many=True)
+        productos_deserializados = Cat_Producto_Serializado(data=request.data)
         if productos_deserializados.is_valid():
             productos_deserializados.save()
             return Response(productos_deserializados.data)
@@ -122,7 +135,7 @@ class servicio_listaAV(APIView):
         return Response(servicios_serializados.data)
 
     def post(self, request):
-        servicios_deserializados = Cat_Servicio_Serializado(servicios, many=True)
+        servicios_deserializados = Cat_Servicio_Serializado(data=request.data)
         if servicios_deserializados.is_valid():
             servicios_deserializados.save()
             return Response(servicios_deserializados.data)
