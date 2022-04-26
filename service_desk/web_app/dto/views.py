@@ -63,8 +63,8 @@ class solicitud_listaAV(APIView):
     permission_classes = [UserOrReadOnly]
 
     def get(self, request):
-        usuario_actual = self.request.user
-        solicitudes = Opr_Solicitud.objects.filter(usuario_solicitud=usuario_actual, activo_solicitud=True)
+        # usuario_actual = self.request.user
+        solicitudes = Opr_Solicitud.objects.filter(activo_solicitud=True)
         solicitudes_serializados = Opr_Solicitud_Serializado(solicitudes, many=True)
         return Response(solicitudes_serializados.data)
 
@@ -80,12 +80,12 @@ class solicitud_listaAV(APIView):
 
 # Class Views para mostrar|actualizar|eliminar un elemento tipo CLIENTE
 class solicitud_detalleAV(APIView):
-    permission_classes = [UserOrWriteOrReadOnly]
+    permission_classes = [UserOrReadOnly]
 
     def get(self, request, id):
         try:
-            usuario_actual = self.request.user
-            solicitud = Opr_Solicitud.objects.get(pk=id, usuario_solicitud=usuario_actual)
+            # usuario_actual = self.request.user
+            solicitud = Opr_Solicitud.objects.get(pk=id)
         except Opr_Solicitud.DoesNotExist:
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud_serializado = Opr_Solicitud_Serializado(solicitud)
@@ -93,8 +93,8 @@ class solicitud_detalleAV(APIView):
 
     def put(self, request, id):
         try:
-            usuario_actual = self.request.user
-            solicitud = Opr_Solicitud.objects.get(pk=id, usuario_solicitud=usuario_actual)
+            # usuario_actual = self.request.user
+            solicitud = Opr_Solicitud.objects.get(pk=id)
         except Opr_Solicitud.DoesNotExist:
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud_serializado = Opr_Solicitud_Serializado(solicitud, data=request.data)
@@ -107,8 +107,8 @@ class solicitud_detalleAV(APIView):
 
     def delete(self, request, id):
         try:
-            usuario_actual = self.request.user
-            solicitud = Opr_Solicitud.objects.get(pk=id, usuario_solicitud=usuario_actual)
+            # usuario_actual = self.request.user
+            solicitud = Opr_Solicitud.objects.get(pk=id)
         except Opr_Solicitud.DoesNotExist:
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud_serializado = Opr_Solicitud_Serializado(solicitud, data=request.data, partial=True)

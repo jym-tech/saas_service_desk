@@ -1,27 +1,23 @@
 from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
 
 
-class StaffOrWriteOrReadOnly(permissions.IsAdminUser):
+class StaffOrWriteOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        staff_permission = bool(request.user and request.user.is_staff)
-        return staff_permission
+        if request.user.is_staff:
+            return True
 
 
 class UserOrReadOnly(permissions.BasePermission):
-    metodos = ('PUT', 'POST', 'DELETE')
-
     def has_permission(self, request, view):
-        if request.method not in self.metodos:
+        if request.user.is_authenticated and request.method in SAFE_METHODS:
             return True
-
-    def has_object_permission(self, request, view, obj):
-        if obj.usuario_solicitud == request.user:
-            return True
-        return False
 
 
 class UserOrWriteOrReadOnly(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if obj.usuario_solicitud == request.user:
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
             return True
-        return False
+
+    def has_object_permission(self, request, view, obj):
+        return obj.usuario_solicitud == request.user

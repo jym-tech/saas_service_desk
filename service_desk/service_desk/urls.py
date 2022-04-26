@@ -25,5 +25,8 @@ urlpatterns = [
     path('app/', include('web_app.dto.urls')),
 
     # Login de RestFramework
-    path('api-auth', include('rest_framework.urls')),
+    # path('api-auth', include('rest_framework.urls')),
+
+    # Path para login de usuario
+    path('cuenta/', include('user_app.dto.urls')),
 ]
