@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework.response import Response
 from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud
 from web_app.dto.serializers import (Cat_Equipo_Serializado, Cat_Cliente_Serializado,
@@ -8,20 +10,21 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated
-from web_app.dto.permissions import StaffOrWriteOrReadOnly, UserOrWriteOrReadOnly, UserOrReadOnly
+from web_app.dto.permissions import IsStaffOrWriteOrReadOnly, IsUserOrWriteOrReadOnly, IsUserOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Clases para crear los querys de consulta de la base de datos
 # Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO - GENERICO
 class producto_lista_Generico(generics.ListCreateAPIView):
-    permission_classes = [StaffOrWriteOrReadOnly]
+    permission_classes = [IsStaffOrWriteOrReadOnly]
     queryset = Cat_Producto.objects.all()
     serializer_class = Cat_Producto_Serializado
 
 
 # Class para mostrar|actualizar|eliminar un elemento tipo PRODUCTO - GENERICO
 class producto_detalle_Generico(generics.RetrieveDestroyAPIView):
-    permission_classes = [StaffOrWriteOrReadOnly]
+    permission_classes = [IsStaffOrWriteOrReadOnly]
     queryset = Cat_Producto.objects.all()
     serializer_class = Cat_Producto_Serializado
     lookup_field = 'id'
@@ -29,7 +32,7 @@ class producto_detalle_Generico(generics.RetrieveDestroyAPIView):
 
 # Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO - GENERICO
 class servicio_lista_Generico(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    permission_classes = [StaffOrWriteOrReadOnly]
+    permission_classes = [IsStaffOrWriteOrReadOnly]
     queryset = Cat_Servicio.objects.all()
     serializer_class = Cat_Servicio_Serializado
 
@@ -43,7 +46,7 @@ class servicio_lista_Generico(mixins.ListModelMixin, mixins.CreateModelMixin, ge
 # Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO - GENERICO
 class servicio_detalle_Generico(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
                                 generics.GenericAPIView):
-    permission_classes = [StaffOrWriteOrReadOnly]
+    permission_classes = [IsStaffOrWriteOrReadOnly]
     queryset = Cat_Servicio.objects.all()
     serializer_class = Cat_Servicio_Serializado
     lookup_field = 'id'
@@ -60,11 +63,14 @@ class servicio_detalle_Generico(mixins.RetrieveModelMixin, mixins.UpdateModelMix
 
 # Class para mostrar la lista de elementos tipo SOLICITUD y crear un elemento tipo SOLICITUD
 class solicitud_listaAV(APIView):
-    permission_classes = [UserOrReadOnly]
+    # permission_classes = [IsUserOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['usuario_solicitud__username', 'activo_solicitud']
 
     def get(self, request):
         # usuario_actual = self.request.user
-        solicitudes = Opr_Solicitud.objects.filter(activo_solicitud=True)
+        # solicitudes = Opr_Solicitud.objects.filter(activo_solicitud=True)
+        solicitudes = Opr_Solicitud.objects.all()
         solicitudes_serializados = Opr_Solicitud_Serializado(solicitudes, many=True)
         return Response(solicitudes_serializados.data)
 
@@ -80,7 +86,7 @@ class solicitud_listaAV(APIView):
 
 # Class Views para mostrar|actualizar|eliminar un elemento tipo CLIENTE
 class solicitud_detalleAV(APIView):
-    permission_classes = [UserOrReadOnly]
+    permission_classes = [IsUserOrWriteOrReadOnly]
 
     def get(self, request, id):
         try:
@@ -113,6 +119,7 @@ class solicitud_detalleAV(APIView):
             return Response({'error': 'Solicitud no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         solicitud_serializado = Opr_Solicitud_Serializado(solicitud, data=request.data, partial=True)
         request.data['usuario_solicitud'] = request.user.id
+        request.data['fecha_baja_solicitud'] = datetime.date.today()
         request.data['activo_solicitud'] = False
         if solicitud_serializado.is_valid():
             solicitud_serializado.save()
@@ -123,6 +130,8 @@ class solicitud_detalleAV(APIView):
 
 # Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO
 class producto_listaAV(APIView):
+    permission_classes = [IsStaffOrWriteOrReadOnly]
+
     def get(self, request):
         productos = Cat_Producto.objects.all()
         productos_serializados = Cat_Producto_Serializado(productos, many=True)
@@ -139,6 +148,8 @@ class producto_listaAV(APIView):
 
 # Class para mostrar la lista de elementos tipo SERVICIO y crear un elemento tipo SERVICIO
 class servicio_listaAV(APIView):
+    permission_classes = [IsStaffOrWriteOrReadOnly]
+
     def get(self, request):
         servicios = Cat_Servicio.objects.all()
         servicios_serializados = Cat_Servicio_Serializado(servicios, many=True)
@@ -155,6 +166,8 @@ class servicio_listaAV(APIView):
 
 # Class para mostrar la lista de elementos tipo CLIENTE y crear un elemento tipo CLIENTE
 class cliente_listaAV(APIView):
+    permission_classes = [IsStaffOrWriteOrReadOnly]
+
     def get(self, request):
         clientes = Cat_Cliente.objects.all()
         clientes_serializados = Cat_Cliente_Serializado(clientes, many=True, context={'request': request})
@@ -171,6 +184,8 @@ class cliente_listaAV(APIView):
 
 # Class Views para mostrar|actualizar|eliminar un elemento tipo CLIENTE
 class cliente_detalleAV(APIView):
+    permission_classes = [IsStaffOrWriteOrReadOnly]
+
     def get(self, request, id):
         try:
             cliente = Cat_Cliente.objects.get(pk=id)
@@ -202,6 +217,8 @@ class cliente_detalleAV(APIView):
 
 # Class para mostrar la lista de elementos tipo EQUIPO y crear un elemento tipo EQUIPO
 class equipo_listaAV(APIView):
+    permission_classes = [IsStaffOrWriteOrReadOnly]
+
     def get(self, request):
         equipos = Cat_Equipo.objects.all()  # Guarda el listado de los todos los elementos de tipo EQUIPO
         equipos_serializados = Cat_Equipo_Serializado(equipos, many=True, context={
@@ -219,6 +236,8 @@ class equipo_listaAV(APIView):
 
 # Class Views para mostrar|actualizar|eliminar un elemento tipo EQUIPO
 class equipo_detalleAV(APIView):
+    permission_classes = [IsStaffOrWriteOrReadOnly]
+
     def get(self, request, id):
         try:
             equipo = Cat_Equipo.objects.get(pk=id)
