@@ -1,6 +1,19 @@
+from django.db.models import Sum
 from rest_framework import serializers
 
-from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud
+from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud, Opr_Cotizacion
+
+
+# Usando Core Arguments para mapear todas propiedades de la entidad OPR_COTIZACION
+class Opr_Cotizacion_Serializado(serializers.ModelSerializer):
+    productos_total_cotizacion = serializers.SerializerMethodField()
+    class Meta:
+        model = Opr_Cotizacion
+        fields = "__all__"
+
+    def get_productos_total_cotizacion(self, object):
+        productos_total = object.all().aggregate(Sum('productos_cotizacion'))
+        return productos_total
 
 # Usando Core Arguments para mapear todas propiedades de la entidad OPR_SOLICITUD
 class Opr_Solicitud_Serializado(serializers.ModelSerializer):
@@ -37,6 +50,8 @@ class Cat_Cliente_Serializado(serializers.HyperlinkedModelSerializer):
         lookup_field='id'
     )
 
+    cliente_cotizacion = Opr_Cotizacion_Serializado(many=True, read_only=True)
+
 
     class Meta:
         model = Cat_Cliente
@@ -58,6 +73,7 @@ class Cat_Equipo_Serializado(serializers.HyperlinkedModelSerializer):
         view_name='equipo-detail',
         lookup_field='id'
     )
+    equipo_cotizacion = Opr_Cotizacion_Serializado(many=True, read_only=True)
 
     class Meta:
         model = Cat_Equipo

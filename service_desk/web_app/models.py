@@ -81,3 +81,18 @@ class Opr_Solicitud(models.Model):
     # Metodo STR regresa una cadena que muestra las columnas id|id_cliente|id_equipo
     def __str__(self):
         return f'Solicitud {self.id} {self.id_cliente_solicitud} {self.id_equipo_solicitud}'
+
+# clase que contiene el diseño de la tabla OPR_COTIZACION
+class Opr_Cotizacion(models.Model):
+    clave_cotizacion = models.CharField(max_length=50)
+    fecha_creacion_cotizacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion_cotizacion = models.DateTimeField(auto_now=True)
+    id_cliente_cotizacion = models.ForeignKey(Cat_Cliente, on_delete=models.CASCADE, related_name="cliente_cotizacion")
+    id_equipo_cotizacion = models.ForeignKey(Cat_Equipo, on_delete=models.CASCADE, related_name="equipo_cotizacion")
+    productos_cotizacion = models.ManyToManyField(Cat_Producto)
+    servicios_cotizacion = models.ManyToManyField(Cat_Servicio)
+    total_cotizacion = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    activo_cotizacion = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'Cotizacion {self.clave_cotizacion}: {str(self.total_cotizacion)}'

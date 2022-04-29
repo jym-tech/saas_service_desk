@@ -20,6 +20,8 @@ class producto_lista_Generico(generics.ListCreateAPIView):
     permission_classes = [IsStaffOrWriteOrReadOnly]
     queryset = Cat_Producto.objects.all()
     serializer_class = Cat_Producto_Serializado
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['activo_producto']
 
 
 # Class para mostrar|actualizar|eliminar un elemento tipo PRODUCTO - GENERICO
@@ -63,14 +65,12 @@ class servicio_detalle_Generico(mixins.RetrieveModelMixin, mixins.UpdateModelMix
 
 # Class para mostrar la lista de elementos tipo SOLICITUD y crear un elemento tipo SOLICITUD
 class solicitud_listaAV(APIView):
-    # permission_classes = [IsUserOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['usuario_solicitud__username', 'activo_solicitud']
+    permission_classes = [IsUserOrReadOnly]
 
     def get(self, request):
         # usuario_actual = self.request.user
-        # solicitudes = Opr_Solicitud.objects.filter(activo_solicitud=True)
-        solicitudes = Opr_Solicitud.objects.all()
+        solicitudes = Opr_Solicitud.objects.filter(activo_solicitud=True)
+        # solicitudes = Opr_Solicitud.objects.all()
         solicitudes_serializados = Opr_Solicitud_Serializado(solicitudes, many=True)
         return Response(solicitudes_serializados.data)
 

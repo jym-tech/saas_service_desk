@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud
+from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud, Opr_Cotizacion
 
 # Registro del modelo CAT_EQUIPO
 admin.site.register(Cat_Equipo)
@@ -17,3 +17,6 @@ admin.site.register(Cat_Producto)
 
 # Registro del modelo OPR_SOLICITUD
 admin.site.register(Opr_Solicitud)
+
+# Registro del modelo OPR_COTIZACION
+admin.site.register(Opr_Cotizacion)
