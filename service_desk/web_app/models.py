@@ -7,7 +7,8 @@ from django.db import models
 # Create your models here.
 # Crear el modelo de la tabla que corresponda con cada entidad de la Base de Datos
 # clase que contiene el diseño de la tabla CAT_EQUIPO
-
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
 
 class Cat_Equipo(models.Model):
@@ -45,7 +46,7 @@ class Cat_Servicio(models.Model):
     sku_servicio = models.CharField(max_length=50)
     tipo_servicio = models.CharField(max_length=50)
     descripcion_servicio = models.CharField(max_length=500)
-    costo_servicio = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    costo_servicio = models.DecimalField(default=0, max_digits=10, decimal_places=2)
     activo_servicio = models.BooleanField(default=True)
 
     # Metodo STR regresa una cadena que muestra las columnas id|descripcion
@@ -57,7 +58,7 @@ class Cat_Producto(models.Model):
     sku_producto = models.CharField(max_length=50)
     tipo_producto = models.CharField(max_length=50)
     descripcion_producto = models.CharField(max_length=500)
-    costo_producto = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    costo_producto = models.DecimalField(default=0, max_digits=10, decimal_places=2)
     activo_producto = models.BooleanField(default=True)
 
     # Metodo STR regresa una cadena que muestra las columnas id|descripcion
@@ -89,10 +90,13 @@ class Opr_Cotizacion(models.Model):
     fecha_modificacion_cotizacion = models.DateTimeField(auto_now=True)
     id_cliente_cotizacion = models.ForeignKey(Cat_Cliente, on_delete=models.CASCADE, related_name="cliente_cotizacion")
     id_equipo_cotizacion = models.ForeignKey(Cat_Equipo, on_delete=models.CASCADE, related_name="equipo_cotizacion")
-    productos_cotizacion = models.ManyToManyField(Cat_Producto)
-    servicios_cotizacion = models.ManyToManyField(Cat_Servicio)
-    total_cotizacion = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    productos_cotizacion = models.ManyToManyField(Cat_Producto, blank=True)
+    servicios_cotizacion = models.ManyToManyField(Cat_Servicio, blank=True)
+    total_cotizacion = models.DecimalField(default=0, max_digits=10, decimal_places=2)
     activo_cotizacion = models.BooleanField(default=True)
+
 
     def __str__(self):
         return f'Cotizacion {self.clave_cotizacion}: {str(self.total_cotizacion)}'
+
+

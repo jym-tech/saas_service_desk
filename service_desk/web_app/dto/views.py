@@ -1,10 +1,12 @@
 import datetime
 
+from django.db.models import Sum, F, Count, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from rest_framework.response import Response
-from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud
+from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud, Opr_Cotizacion
 from web_app.dto.serializers import (Cat_Equipo_Serializado, Cat_Cliente_Serializado,
                                      Cat_Servicio_Serializado, Cat_Producto_Serializado,
-                                     Opr_Solicitud_Serializado)
+                                     Opr_Solicitud_Serializado, Opr_Cotizacion_Serializado)
 # from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
@@ -126,6 +128,35 @@ class solicitud_detalleAV(APIView):
             return Response(solicitud_serializado.data)
         else:
             return Response(solicitud_serializado.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Class para mostrar la lista de elementos tipo COTIZACION y crear un elemento tipo COTIZACION
+class cotizacion_listaAV(generics.ListCreateAPIView):
+    # permission_classes = [IsUserOrReadOnly]
+    queryset = Opr_Cotizacion.objects.all()
+    serializer_class = Opr_Cotizacion_Serializado
+
+    # def post(self, request):
+    #     cotizaciones_deserializados = Opr_Cotizacion_Serializado(data=request.data)
+    #
+    #     if cotizaciones_deserializados.is_valid():
+    #         cotizaciones_deserializados.save()
+    #         return Response(cotizaciones_deserializados.data)
+    #     else:
+    #         return Response(cotizaciones_deserializados.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def post(self, request, *args, **kwargs):
+    #     cotizacion = Opr_Cotizacion.objects.filter(productos_cotizacion__pk=F('pk'))
+    #     cotizacion.aggregate(total_cotizacion=Sum(
+    #         Coalesce('productos_cotizacion__costo_producto', 'servicios_cotizacion__costo_servicio')))
+    #     return self.create(request, *args, **kwargs)
+
+    # def get(self, request):
+    #     cotizaciones = Opr_Cotizacion.objects.filter(activo_cotizacion=True)
+    #     # cotizaciones = Opr_Cotizacion.objects.all()
+    #     cotizaciones_serializados = Opr_Cotizacion_Serializado(cotizaciones, many=True)
+    #     return Response(cotizaciones_serializados.data)
+    #
 
 
 # Class para mostrar la lista de elementos tipo PRODUCTO y crear un elemento tipo PRODUCTO

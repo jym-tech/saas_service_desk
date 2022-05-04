@@ -1,19 +1,9 @@
 from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from rest_framework import serializers
 
 from web_app.models import Cat_Equipo, Cat_Cliente, Cat_Servicio, Cat_Producto, Opr_Solicitud, Opr_Cotizacion
 
-
-# Usando Core Arguments para mapear todas propiedades de la entidad OPR_COTIZACION
-class Opr_Cotizacion_Serializado(serializers.ModelSerializer):
-    productos_total_cotizacion = serializers.SerializerMethodField()
-    class Meta:
-        model = Opr_Cotizacion
-        fields = "__all__"
-
-    def get_productos_total_cotizacion(self, object):
-        productos_total = object.all().aggregate(Sum('productos_cotizacion'))
-        return productos_total
 
 # Usando Core Arguments para mapear todas propiedades de la entidad OPR_SOLICITUD
 class Opr_Solicitud_Serializado(serializers.ModelSerializer):
@@ -33,6 +23,31 @@ class Cat_Servicio_Serializado(serializers.ModelSerializer):
     class Meta:
         model = Cat_Servicio
         fields = "__all__"
+
+# Usando Core Arguments para mapear todas propiedades de la entidad OPR_COTIZACION
+class Opr_Cotizacion_Serializado(serializers.ModelSerializer):
+    # productos_cotizacion = Cat_Producto_Serializado(many=True)
+    # productos_cotizacion = serializers.StringRelatedField(many=True)
+    # servicios_cotizacion = serializers.StringRelatedField(many=True)
+    # total = serializers.SerializerMethodField()
+    # total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Opr_Cotizacion
+        fields = "__all__"
+    # def get_total(self, object):
+        # total_productos = Opr_Cotizacion.objects.filter(pk=object.pk).aggregate(
+        #     total_productos=Sum('productos_cotizacion__costo_producto'))
+        # total_servicios = Opr_Cotizacion.objects.filter(pk=object.pk).aggregate(
+        #     total_servicios=Sum('servicios_cotizacion__costo_servicio'))
+        # return total_productos, total_servicios
+        # total = Opr_Cotizacion.objects.filter(pk=object.pk).aggregate(
+        #     total_cotizacion=Sum(Coalesce('productos_cotizacion__costo_producto',
+        #                                   'servicios_cotizacion__costo_servicio')))
+        # return total
+
+
+
 
 # Usando Core Arguments para mapear todas propiedades de la entidad CAT_CLIENTE
 class Cat_Cliente_Serializado(serializers.HyperlinkedModelSerializer):
