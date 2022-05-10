@@ -29,7 +29,8 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+# rest_framework.authtoken Agrega una nueva tabla en la BD, es necesario realizar la migracion
+# django_filters Permite usar filterset en las vistas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -131,13 +132,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permitir acceso solo autenticado
 # Permitir el uso de tokens
 # Permitir que se inicie sesion desde una app externa enviando usuario y contrasena
 REST_FRAMEWORK = {
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated'
-    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -146,6 +143,7 @@ REST_FRAMEWORK = {
     ]
 }
 
+# Permitir acceso solo autenticado
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': [
 #         'rest_framework.authentication.BasicAuthentication',

@@ -26,15 +26,40 @@ class Cat_Servicio_Serializado(serializers.ModelSerializer):
 
 # Usando Core Arguments para mapear todas propiedades de la entidad OPR_COTIZACION
 class Opr_Cotizacion_Serializado(serializers.ModelSerializer):
-    # productos_cotizacion = Cat_Producto_Serializado(many=True)
+    # productos_cotizacion = Cat_Producto_Serializado(many=True, read_only=False)
+    # servicios_cotizacion = Cat_Servicio_Serializado(many=True, read_only=False)
     # productos_cotizacion = serializers.StringRelatedField(many=True)
     # servicios_cotizacion = serializers.StringRelatedField(many=True)
     # total = serializers.SerializerMethodField()
-    # total = serializers.SerializerMethodField()
+    total = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Opr_Cotizacion
         fields = "__all__"
+        # extra_kwargs = {'productos_cotizacion': {'required': False}, 'servicios_cotizacion': {'required': False}}
+
+    # def create(self, validated_data):
+    #     productos = validated_data.pop('productos_cotizacion')
+    #     instancia = Opr_Cotizacion.objects.create(**validated_data)
+    #     for producto in productos:
+    #         instancia.productos.add(producto)
+    #     return instancia
+
+    # def update(self, instance, validated_data):
+    #     productos_data = validated_data.pop('productos_cotizacion')
+    #     instance = super(Opr_Cotizacion_Serializado, self).update(instance, validated_data)
+    #
+    #     for productos_data in productos_data:
+    #         productos_qs = Cat_Producto.objects.filter(id__iexact=productos_data['id'])
+    #
+    #         if productos_qs.exist():
+    #             productos_cotizacion = productos_qs.first()
+    #         else:
+    #             productos_cotizacion = Cat_Producto.objects.create(**productos_data)
+    #
+    #         instance.productos_cotizacion.add(productos_cotizacion)
+    #     return instance
+
     # def get_total(self, object):
         # total_productos = Opr_Cotizacion.objects.filter(pk=object.pk).aggregate(
         #     total_productos=Sum('productos_cotizacion__costo_producto'))
@@ -45,8 +70,6 @@ class Opr_Cotizacion_Serializado(serializers.ModelSerializer):
         #     total_cotizacion=Sum(Coalesce('productos_cotizacion__costo_producto',
         #                                   'servicios_cotizacion__costo_servicio')))
         # return total
-
-
 
 
 # Usando Core Arguments para mapear todas propiedades de la entidad CAT_CLIENTE
